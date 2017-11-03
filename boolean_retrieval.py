@@ -1,5 +1,5 @@
 #For user interface and web scraping
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from bs4 import BeautifulSoup
 import urllib
 from beautifultable import BeautifulTable
@@ -95,34 +95,46 @@ def get_query_results(query, terms, matrix):
 		term2 = qterms[2]
 		operator = qterms[1]
 
+
+	#getting the postings index for both the query terms
+	if term1 in terms:
+		index1 = terms.index(term1)
+	else:
+		index1 = -1
+
+	if term2 in terms:
+		index2 = terms.index(term2)
+	else:
+		index2 = -1
+
 	
 	docs_term1 = []
 	docs_term2 = []
-	relevant_docs = []
-
-	#getting the postings index for both the query terms
-	index1 = terms.index(term1)
-	index2 = terms.index(term2)
 
 	#Getting the relevant documents for individual query terms
-	for j in range(len(matrix[index1])):
-		if matrix[index1][j] == 1:
-			docs_term1.append(j)
+	if index1 >= 0:
+		for j in range(len(matrix[index1])):
+			if matrix[index1][j] == 1:
+				docs_term1.append(j)
 
-	for j in range(len(matrix[index2])):
-		if matrix[index2][j] == 1:
-			docs_term2.append(j)
+	if index2 >= 0:
+		for j in range(len(matrix[index2])):
+			if matrix[index2][j] == 1:
+				docs_term2.append(j)
+
+	relevant_docs = []
 
 	#getting the desired doc ids
-	if operator == 'and':
+	if operator == 'and' and index1 != -1 and index2 != -1:
 		#The filter takes each sublist's item and checks to see if it's in the source list doc_terms1, the list comprehension is executed for each sublist in docs_terms2
 		relevant_docs = set(docs_term1).intersection(docs_term2)
 
-	elif operator == 'or':
+	elif operator == 'or' and (index1 >= 0 or index2 >= 0):
 		relevant_docs = set(docs_term1 + docs_term2)
 
 	if len(relevant_docs) == 0:
 		print("No matching documents found!")
+		return False
 	else:
 		print("The relevant documents are: ", end = " ")
 		for i in relevant_docs:
@@ -138,6 +150,9 @@ def home():
 
 		matrix, terms = create_term_matrix()
 		relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
+		if relevant_docs == False:
+			return render_template('home.html', msg = "No relevant documents found!")
+		
 		data_dict = {}
 		cur = mysql.connection.cursor()
 		for doc in relevant_docs:

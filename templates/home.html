@@ -23,6 +23,11 @@
 			</div>
 		</div>
 	</form>
+	{% if msg is defined %}
+	<h2 align = "center" >{{msg}}</h2>
+	{% endif %}
+	
+
 	{% if data_dict is defined %}	
 		<ul>
 		{% for key in data_dict %}
