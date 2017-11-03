@@ -1,5 +1,24 @@
+#For user interface and web scraping
+from flask import Flask, render_template, request
+from bs4 import BeautifulSoup
+import urllib
+
+#MySQL database
+from flask_mysqldb import MySQL
+
+#For linguistic preprocessing
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+
+#creating the app engine
+app = Flask(__name__)
+
+
+#configuring sql settings
+from sql_config import configure
+configure(app)
+mysql = MySQL(app)
+
 
 def create_term_matrix():
 	documents = []
@@ -37,20 +56,6 @@ def create_term_matrix():
 		print("")
 
 	return matrix, terms
-
-
-def evaluate_query_infix(qterms):
-	term_stack = [], op_stack = [], ctr = 0
-	oplist = ['and', 'or'] #not?
-	while(qterms):
-		term = qterms[ctr]
-		ctr += 1
-		if (term not in oplist):
-			#We have a query term or a left paranthesis
-			term_stack.append(term)
-		elif term == '(':
-			op_stack.append(term)
-
 
 def get_query_results(query, terms, matrix):
 	qterms = query.lower().split(" ")
@@ -91,54 +96,49 @@ def get_query_results(query, terms, matrix):
 		print("The relevant documents are: ", end = " ")
 		for i in relevant_docs:
 			print("Document:" + str(i+1), end = " ")
-	
+	print()
 
-
-
-matrix, terms = create_term_matrix()
-query = input("Enter query: ")
-get_query_results(query=query, terms=terms, matrix=matrix)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-from flask import Flask, render_template, request
-from bs4 import BeautifulSoup
-import urllib
-
-app = Flask(__name__)
+	return relevant_docs
 
 @app.route('/', methods = ['GET', 'POST'])
 def home():
-	if request.method == 'POST':
-		print("HELOOOOOOOOO")
-		link = request['url']
-		f = urllib.urlopen(link)
-		soup = BeautifulSoup(f)
+	#if request.method == 'POST':
+		# print("HELOOOOOOOOO")
+		# link = request['url']
+		# f = urllib.urlopen(link)
+		# soup = BeautifulSoup(f)
 
-		for tag in soup.find_all('p'):
-			print(tag)
+		# for tag in soup.find_all('p'):
+		# 	print(tag)
+	
 
-	return render_template('index.html')
+	query = input("Enter query")
+	matrix, terms = create_term_matrix()
+	relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
 
 
-
+	return render_template('index.html', docs = relevant_docs)
 
 
 
 if __name__ == '__main__':
 	app.run(debug=True)
+
+
+
+'''
+FOR MULTIPLE OPERATORS
+
+def evaluate_query_infix(qterms):
+	term_stack = [], op_stack = [], ctr = 0
+	oplist = ['and', 'or'] #not?
+	while(qterms):
+		term = qterms[ctr]
+		ctr += 1
+		if (term not in oplist):
+			#We have a query term or a left paranthesis
+			term_stack.append(term)
+		elif term == '(':
+			op_stack.append(term)
 
 '''
