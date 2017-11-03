@@ -122,6 +122,11 @@ def home():
 		title = title["content"]
 		
 		logger(title)
+
+		cur = mysql.connection.cursor()
+		cur.execute("insert into data (title, link, content) values (%s, %s, %s)", (title, link, body))
+		mysql.connection.commit()
+		cur.close()
 		
 
 		return redirect(url_for('home'))
