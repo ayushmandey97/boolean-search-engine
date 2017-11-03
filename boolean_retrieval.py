@@ -21,41 +21,47 @@ mysql = MySQL(app)
 
 
 def create_term_matrix():
-	documents = []
+	cur = mysql.connection.cursor()
+	result = cur.execute("select content from data")
+	if result > 0:
+		documents = []
 
-	doc1 = "The students like the subject information retrival a lot because they want to understand how stuff like google works"
-	doc2 = "The students dont like to study operating systems because that shit is wack"
+		data = cur.fetchall()
+		for row in data:
+			documents.append(row['content'].lower())
 
-	documents.append(doc1.lower())
-	documents.append(doc2.lower())
+		#Tokenizing the document
+		tokens = []
+		for doc in documents:
+			tokens.extend(word_tokenize(doc))
 
-	#Tokenizing the document
-	tokens = []
-	for doc in documents:
-		tokens.extend(word_tokenize(doc))
+		#Getting the list of stop words
+		stop_words = set(stopwords.words('english'))
 
-	#Getting the list of stop words
-	stop_words = set(stopwords.words('english'))
+		#eliminating stop words from the documents
+		terms = [word for word in tokens if not word in stop_words]
 
-	#eliminating stop words from the documents
-	terms = [word for word in tokens if not word in stop_words]
+		print(tokens) #contains stop words
+		print(terms) #doesnt contain stop words
 
-	print(tokens) #contains stop words
-	print(terms) #doesnt contain stop words
+		#Generating the term-document incidence matrix
+		matrix = [[0 for x in range(len(documents))] for y in range(len(terms))]
+		for i,term in enumerate(terms):
+			for j,doc in enumerate(documents):
+				matrix[i][j] = 1 if term in doc else 0
 
-	#Generating the term-document incidence matrix
-	matrix = [[0 for x in range(len(documents))] for y in range(len(terms))]
-	for i,term in enumerate(terms):
-		for j,doc in enumerate(documents):
-			matrix[i][j] = 1 if term in doc else 0
+		#Displaying the matrix
+		for i in range(len(terms)):
+			for j in range(len(documents)):
+				print(matrix[i][j], end = " ")
+			print("")
 
-	#Displaying the matrix
-	for i in range(len(terms)):
-		for j in range(len(documents)):
-			print(matrix[i][j], end = " ")
-		print("")
+		return matrix, terms
 
-	return matrix, terms
+	else:
+		logger("No data found, cannot create matrix!")
+
+	
 
 def get_query_results(query, terms, matrix):
 	'''
@@ -64,10 +70,16 @@ def get_query_results(query, terms, matrix):
 			A OR B
 	'''
 	qterms = query.lower().split(" ")
-
-	term1 = qterms[0]
-	term2 = qterms[2]
-	operator = qterms[1]
+	
+	if len(qterms) == 1:
+		term1 = qterms[0]
+		term2 = qterms[0]
+		operator = 'and'
+	
+	else:
+		term1 = qterms[0]
+		term2 = qterms[2]
+		operator = qterms[1]
 
 	
 	docs_term1 = []
@@ -108,6 +120,28 @@ def get_query_results(query, terms, matrix):
 @app.route('/', methods = ['GET', 'POST'])
 def home():
 	if request.method == 'POST':
+		query = request.form['query']
+
+		matrix, terms = create_term_matrix()
+		relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
+		data_dict = {}
+		cur = mysql.connection.cursor()
+		for doc in relevant_docs:
+			cur.execute("select title, link from data where id = %s",[doc+1])
+			data = cur.fetchone()
+			data_dict[data['title']] = data['link']
+
+		cur.close()
+
+		return render_template('home.html', data_dict = data_dict)
+
+
+	return render_template('home.html')
+
+@app.route('/index', methods = ['GET', 'POST'])
+def index():
+	if request.method == 'POST':
+		#Indexing the entered document
 		link = request.form['url']
 		req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
 		f = urllib.request.urlopen(req).read()
@@ -126,20 +160,29 @@ def home():
 		cur = mysql.connection.cursor()
 		cur.execute("insert into data (title, link, content) values (%s, %s, %s)", (title, link, body))
 		mysql.connection.commit()
+
+		#getting the updated indexed data
+		res = cur.execute("select title, link from data")
+		data_dict = {}
+		if res > 0:
+			data = cur.fetchall()
+			for row in data:
+				data_dict[row['title']] = row['link']
 		cur.close()
-		
-
-		return redirect(url_for('home'))
+		logger(data_dict)
+		return render_template('index.html', data_dict=data_dict)
 	
-
-	query = input("Enter query: ")
-	matrix, terms = create_term_matrix()
-	relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
-
-
-	return render_template('index.html', docs = relevant_docs)
-
-
+	#getting the indexed data
+	cur = mysql.connection.cursor()
+	res = cur.execute("select title, link from data")
+	data_dict = {}
+	if res > 0:
+		data = cur.fetchall()
+		for row in data:
+			data_dict[row['title']] = row['link']
+	cur.close()
+	logger(data_dict)
+	return render_template('index.html', data_dict=data_dict)
 
 
 def logger(msg):

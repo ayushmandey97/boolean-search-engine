@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>INDEX</title>
+	<title>HOME</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'index.css')}}">
 </head>
@@ -11,7 +11,7 @@
 		        <div class="col-sm-6 col-sm-offset-3">
 		            <div id="imaginary_container"> 
 		                <div class="input-group stylish-input-group">
-		                    <input type="text" class="form-control"  placeholder="Search" name = "url">
+		                    <input type="text" class="form-control"  placeholder="Search" name = "query">
 		                    <span class="input-group-addon">
 		                        <button type="submit">
 		                            <span class="glyphicon glyphicon-search"></span>
@@ -23,11 +23,14 @@
 			</div>
 		</div>
 	</form>
-	<ul>
-	{% for key in data_dict %}
-		<li> <a href = "{{data_dict[key]}}"> {{key}} </a></li>
-	{% endfor %}
-	</ul>
+	{% if data_dict is defined %}	
+		<ul>
+		{% for key in data_dict %}
+			<li> <a href = "{{data_dict[key]}}"> {{key}} </a></li>
+		{% endfor %}
+		</ul>
+
+	{% endif %}
 	<script type="text/javascript" src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
