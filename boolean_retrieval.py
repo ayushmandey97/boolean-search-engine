@@ -1,5 +1,5 @@
 #For user interface and web scraping
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from bs4 import BeautifulSoup
 import urllib
 
@@ -58,6 +58,11 @@ def create_term_matrix():
 	return matrix, terms
 
 def get_query_results(query, terms, matrix):
+	'''
+		SUPPORTS 
+			A AND B
+			A OR B
+	'''
 	qterms = query.lower().split(" ")
 
 	term1 = qterms[0]
@@ -102,17 +107,19 @@ def get_query_results(query, terms, matrix):
 
 @app.route('/', methods = ['GET', 'POST'])
 def home():
-	#if request.method == 'POST':
-		# print("HELOOOOOOOOO")
-		# link = request['url']
-		# f = urllib.urlopen(link)
-		# soup = BeautifulSoup(f)
+	if request.method == 'POST':
+		link = request.form['url']
+		req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
+		f = urllib.request.urlopen(req).read()
+		soup = BeautifulSoup(f)
 
-		# for tag in soup.find_all('p'):
-		# 	print(tag)
+		for page in soup.find_all('p'):
+			print(page.get_text())
+
+		return redirect(url_for('home'))
 	
 
-	query = input("Enter query")
+	query = input("Enter query: ")
 	matrix, terms = create_term_matrix()
 	relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
 

@@ -2,8 +2,10 @@
 <head>
 	<title>INDEX</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'index.css')}}">
 </head>
 <body>
+		<form method = "POST">
 		<div class="container">
 			<div class="row">
 		        <div class="col-sm-6 col-sm-offset-3">
@@ -20,6 +22,7 @@
 		        </div>
 			</div>
 		</div>
+	</form>
 		<table>
 			{% for i in docs %}
 			<tr><td>{{i+1}}</td></tr>
