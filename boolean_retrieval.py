@@ -112,9 +112,17 @@ def home():
 		req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
 		f = urllib.request.urlopen(req).read()
 		soup = BeautifulSoup(f)
-
+		body = ""
 		for page in soup.find_all('p'):
-			print(page.get_text())
+			body += page.get_text() + " "
+
+		logger(body)
+
+		title = soup.find("meta",  property="og:title")
+		title = title["content"]
+		
+		logger(title)
+		
 
 		return redirect(url_for('home'))
 	
@@ -126,6 +134,15 @@ def home():
 
 	return render_template('index.html', docs = relevant_docs)
 
+
+
+
+def logger(msg):
+	print("**********************")
+	print("\n\n\n")
+	print(msg)
+	print("\n\n\n")
+	print("**********************")
 
 
 if __name__ == '__main__':
