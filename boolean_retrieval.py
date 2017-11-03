@@ -2,6 +2,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from bs4 import BeautifulSoup
 import urllib
+from beautifultable import BeautifulTable
+
 
 #MySQL database
 from flask_mysqldb import MySQL
@@ -21,6 +23,7 @@ mysql = MySQL(app)
 
 
 def create_term_matrix():
+	table = BeautifulTable()
 	cur = mysql.connection.cursor()
 	result = cur.execute("select content from data")
 	if result > 0:
@@ -42,19 +45,30 @@ def create_term_matrix():
 		terms = [word for word in tokens if not word in stop_words]
 
 		print(tokens) #contains stop words
+
+		terms = list(set(terms))
 		print(terms) #doesnt contain stop words
+
+		doc_headers = ["Terms"]
+		for i in range(len(documents)):
+			s = "DocID:" + str(i+1)
+			doc_headers.append(s)
+
+		table.column_headers = doc_headers
 
 		#Generating the term-document incidence matrix
 		matrix = [[0 for x in range(len(documents))] for y in range(len(terms))]
 		for i,term in enumerate(terms):
 			for j,doc in enumerate(documents):
 				matrix[i][j] = 1 if term in doc else 0
+			l = []
+			l.append(term)
+			l.extend(list(matrix[i]))
+			
+			table.append_row(l)
 
 		#Displaying the matrix
-		for i in range(len(terms)):
-			for j in range(len(documents)):
-				print(matrix[i][j], end = " ")
-			print("")
+		print(table)
 
 		return matrix, terms
 
