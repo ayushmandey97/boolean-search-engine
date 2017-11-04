@@ -14,7 +14,6 @@ from nltk.corpus import stopwords
 #creating the app engine
 app = Flask(__name__)
 
-
 #configuring sql settings
 from sql_config import configure
 configure(app)
@@ -28,6 +27,7 @@ def create_term_matrix():
 	if result > 0:
 		documents = []
 
+		#Getting the content from stored documents
 		data = cur.fetchall()
 		for row in data:
 			documents.append(row['content'].lower())
@@ -37,17 +37,18 @@ def create_term_matrix():
 		for doc in documents:
 			tokens.extend(word_tokenize(doc))
 
+		print(tokens) #contains stop words
+		
 		#Getting the list of stop words
 		stop_words = set(stopwords.words('english'))
 
 		#eliminating stop words from the documents
 		terms = [word for word in tokens if not word in stop_words]
-
-		print(tokens) #contains stop words
-
 		terms = list(set(terms))
+		
 		print(terms) #doesnt contain stop words
 
+		#Conforming term document incidence matrix header to BeautifulTable format
 		doc_headers = ["Terms"]
 		for i in range(len(documents)):
 			s = "DocID:" + str(i+1)
@@ -69,6 +70,7 @@ def create_term_matrix():
 		#Displaying the matrix
 		print(table)
 
+		#Returning the TDI matrix and the list of terms generated through indexed documents
 		return matrix, terms
 
 	else:
@@ -86,6 +88,7 @@ def get_query_results(query, terms, matrix):
 	'''
 	qterms = query.lower().split(" ")
 
+	#Flag = False indicates that the term is in NOT form
 	flag1 = True
 	flag2 = True
 	
@@ -146,6 +149,8 @@ def get_query_results(query, terms, matrix):
 			else:
 				if matrix[index1][j] == 1:
 					docs_term1.append(j)
+
+	#Handling case for when the term entered doesnt exist in the term list
 	else:
 		if flag1 == False:
 			for i in range(len(matrix[0])):
@@ -171,7 +176,6 @@ def get_query_results(query, terms, matrix):
 
 	#getting the desired doc ids
 	if operator == 'and':
-		#The filter takes each sublist's item and checks to see if it's in the source list doc_terms1, the list comprehension is executed for each sublist in docs_terms2
 		relevant_docs = set(docs_term1).intersection(docs_term2)
 
 	elif operator == 'or':
@@ -186,6 +190,7 @@ def get_query_results(query, terms, matrix):
 			print("Document:" + str(i+1), end = " ")
 	print()
 
+	#Returning the list of relevant docs
 	return relevant_docs
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -195,11 +200,14 @@ def home():
 
 		matrix, terms = create_term_matrix()
 		relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
+		
 		if relevant_docs == False:
 			return render_template('home.html', msg = "No relevant documents found!")
 		
 		data_dict = {}
 		cur = mysql.connection.cursor()
+
+		#Getting the list of relevant documents to be displayed as search results
 		for doc in relevant_docs:
 			cur.execute("select title, link from data where id = %s",[doc+1])
 			data = cur.fetchone()
@@ -214,22 +222,27 @@ def home():
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
 	if request.method == 'POST':
+		
 		#Indexing the entered document
 		link = request.form['url']
 		req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
 		f = urllib.request.urlopen(req).read()
 		soup = BeautifulSoup(f)
 		body = ""
+
+		#Getting the document body from the p tags
 		for page in soup.find_all('p'):
 			body += page.get_text() + " "
 
 		logger(body)
 
+		#Getting the document title from the meta-title tags
 		title = soup.find("meta",  property="og:title")
 		title = title["content"]
 		
 		logger(title)
 
+		#Storing indexed document into database for faster retrieval
 		cur = mysql.connection.cursor()
 		cur.execute("insert into data (title, link, content) values (%s, %s, %s)", (title, link, body))
 		mysql.connection.commit()
@@ -257,7 +270,7 @@ def index():
 	logger(data_dict)
 	return render_template('index.html', data_dict=data_dict)
 
-
+#To pring helpful messages
 def logger(msg):
 	print("**********************")
 	print("\n\n\n")
