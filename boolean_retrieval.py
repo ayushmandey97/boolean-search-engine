@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import urllib
 from beautifultable import BeautifulTable
 
-
 #MySQL database
 from flask_mysqldb import MySQL
 
@@ -75,28 +74,55 @@ def create_term_matrix():
 	else:
 		logger("No data found, cannot create matrix!")
 
-	
-
 def get_query_results(query, terms, matrix):
+	
 	'''
-		SUPPORTS 
+		SUPPORTS
+			A (single term query)
 			A AND B
 			A OR B
+
+			where A/B can be replaced by NOT A / NOT B
 	'''
 	qterms = query.lower().split(" ")
+
+	flag1 = True
+	flag2 = True
 	
+	#If it's a query containing NOT
+	if 'not' in qterms:
+		if qterms.count('not') == 2:
+			flag1 = False
+			flag2 = False
+			qterms.remove('not')
+			qterms.remove('not')
+
+		else:
+			if qterms[0] == 'not':
+				flag1 = False
+			else:
+				flag2 = False
+
+			qterms.remove('not')
+
+	#If it's a single term query
 	if len(qterms) == 1:
+		if flag1 == False or flag2 == False:
+			flag1 = False
+			flag2 = False
 		term1 = qterms[0]
 		term2 = qterms[0]
 		operator = 'and'
-	
+
+	#Two term query
 	else:
 		term1 = qterms[0]
 		term2 = qterms[2]
 		operator = qterms[1]
 
-
-	#getting the postings index for both the query terms
+	logger(str(flag1) + str(flag2))
+	
+	#getting the index for both the query terms in matrix
 	if term1 in terms:
 		index1 = terms.index(term1)
 	else:
@@ -107,29 +133,48 @@ def get_query_results(query, terms, matrix):
 	else:
 		index2 = -1
 
-	
+	#Postings lists
 	docs_term1 = []
 	docs_term2 = []
 
-	#Getting the relevant documents for individual query terms
+	#Getting the relevant documents for individual query terms (postings)
 	if index1 >= 0:
 		for j in range(len(matrix[index1])):
-			if matrix[index1][j] == 1:
-				docs_term1.append(j)
-
+			if flag1 == False:
+				if matrix[index1][j] == 0:
+					docs_term1.append(j)
+			else:
+				if matrix[index1][j] == 1:
+					docs_term1.append(j)
+	else:
+		if flag1 == False:
+			for i in range(len(matrix[0])):
+				docs_term1.append(i)
+	
 	if index2 >= 0:
 		for j in range(len(matrix[index2])):
-			if matrix[index2][j] == 1:
-				docs_term2.append(j)
+			if flag2 == False:
+				if matrix[index2][j] == 0:
+					docs_term2.append(j)
+			else:
+				if matrix[index2][j] == 1:
+					docs_term2.append(j)
+	else:
+		if flag2 == False:
+			for i in range(len(matrix[0])):
+				docs_term2.append(i)
 
+	logger(docs_term1)
+	logger(docs_term2)
+	
 	relevant_docs = []
 
 	#getting the desired doc ids
-	if operator == 'and' and index1 != -1 and index2 != -1:
+	if operator == 'and':
 		#The filter takes each sublist's item and checks to see if it's in the source list doc_terms1, the list comprehension is executed for each sublist in docs_terms2
 		relevant_docs = set(docs_term1).intersection(docs_term2)
 
-	elif operator == 'or' and (index1 >= 0 or index2 >= 0):
+	elif operator == 'or':
 		relevant_docs = set(docs_term1 + docs_term2)
 
 	if len(relevant_docs) == 0:
@@ -163,7 +208,6 @@ def home():
 		cur.close()
 
 		return render_template('home.html', data_dict = data_dict)
-
 
 	return render_template('home.html')
 
@@ -224,22 +268,3 @@ def logger(msg):
 
 if __name__ == '__main__':
 	app.run(debug=True)
-
-
-
-'''
-FOR MULTIPLE OPERATORS
-
-def evaluate_query_infix(qterms):
-	term_stack = [], op_stack = [], ctr = 0
-	oplist = ['and', 'or'] #not?
-	while(qterms):
-		term = qterms[ctr]
-		ctr += 1
-		if (term not in oplist):
-			#We have a query term or a left paranthesis
-			term_stack.append(term)
-		elif term == '(':
-			op_stack.append(term)
-
-'''

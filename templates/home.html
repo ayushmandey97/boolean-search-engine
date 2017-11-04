@@ -29,10 +29,11 @@
 		<br>
 		<div align = "right" class = "container" style = "display:inline-block">
 				<button type="Submit" class="btn btn-default btn-lg" id="add">Search</button>
-				<a href="/index"><button type="button" class="btn btn-primary btn-lg" id="add">Add documents</button></a>
+				<a href="/index"><button style = "margin-left:70px;"type="button" class="btn btn-primary btn-lg" id="add">Add documents</button></a>
 		</div>
 	</form>
-	
+	<br>
+	<br>
 	
 	{% if msg is defined %}
 	<h2 align = "center" >{{msg}}</h2>
@@ -42,7 +43,7 @@
 	{% if data_dict is defined %}	
 		<ul>
 		{% for key in data_dict %}
-			<li> <a href = "{{data_dict[key]}}"> {{key}} </a></li>
+			<h3><li style="list-style: none;" align = "center"> <a href = "{{data_dict[key]}}"> {{key}} </a></li><h3>
 		{% endfor %}
 		</ul>
 
