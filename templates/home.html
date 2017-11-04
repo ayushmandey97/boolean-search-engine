@@ -28,8 +28,8 @@
 		</div>
 		<br>
 		<div align = "right" class = "container" style = "display:inline-block">
-				<button type="Submit" class="btn btn-default btn-lg" id="add">Search</button>
-				<a href="/index"><button style = "margin-left:70px;"type="button" class="btn btn-primary btn-lg" id="add">Add documents</button></a>
+				<button type="Submit" class="btn btn-default btn-lg" id="add">Search document</button>
+				<a href="/index"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Add documents</button></a>
 		</div>
 	</form>
 	<br>
@@ -41,6 +41,11 @@
 	
 
 	{% if data_dict is defined %}	
+		
+		<hr>
+		<h3 align = "center">Search Results</h3> 
+		<hr>
+		
 		<ul>
 		{% for key in data_dict %}
 			<h3><li style="list-style: none;" align = "center"> <a href = "{{data_dict[key]}}"> {{key}} </a></li><h3>

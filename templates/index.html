@@ -26,10 +26,20 @@
 		        </div>
 			</div>
 		</div>
+		<br>
+		<div align = "right" class = "container" style = "display:inline-block">
+				<button type="Submit" class="btn btn-default btn-lg" id="add">Add document</button>
+				<a href="/"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Continue searching</button></a>
+		</div>
 	</form>
+	<br>
+	<hr>
+	<h3 align = "center">List of indexed documents</h3> 
+	<hr>
+	
 	<ul>
 	{% for key in data_dict %}
-		<li> <a href = "{{data_dict[key]}}"> {{key}} </a></li>
+		<h3><li style="list-style: none;" align = "center"> <a href = "{{data_dict[key]}}"> {{key}} </a></li><h3>
 	{% endfor %}
 	</ul>
 	<script type="text/javascript" src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
