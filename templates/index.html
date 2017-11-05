@@ -3,10 +3,12 @@
 	<title>INDEX</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'index.css')}}">
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet"> 
 </head>
 <body>
-		<div class = "jumbotron">
-			<h1 align = "center"  style = "font-family:Calibri;"> Add documents for BoolScraper to index them </h1>
+		<div>
+			<h1 align = "center"> Index documents </h1>
 		</div>
 		
 		<form method = "POST">
@@ -27,7 +29,7 @@
 			</div>
 		</div>
 		<br>
-		<div align = "right" class = "container" style = "display:inline-block">
+		<div class = "btns" style = "display:inline-block">
 				<button type="Submit" class="btn btn-default btn-lg" id="add">Add document</button>
 				<a href="/"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Continue searching</button></a>
 		</div>
