@@ -183,7 +183,7 @@ def get_query_results(query, terms, matrix):
 
 	if len(relevant_docs) == 0:
 		print("No matching documents found!")
-		return False
+		return False, query
 	else:
 		print("The relevant documents are: ", end = " ")
 		for i in relevant_docs:
@@ -191,7 +191,7 @@ def get_query_results(query, terms, matrix):
 	print()
 
 	#Returning the list of relevant docs
-	return relevant_docs
+	return relevant_docs, query
 
 @app.route('/', methods = ['GET', 'POST'])
 def home():
@@ -199,10 +199,10 @@ def home():
 		query = request.form['query']
 
 		matrix, terms = create_term_matrix()
-		relevant_docs = get_query_results(query=query, terms=terms, matrix=matrix)
+		relevant_docs, query = get_query_results(query=query, terms=terms, matrix=matrix)
 		
 		if relevant_docs == False:
-			return render_template('home.html', msg = "No relevant documents found!")
+			return render_template('home.html', msg = "No relevant documents found", query = query)
 		
 		data_dict = {}
 		cur = mysql.connection.cursor()
@@ -215,7 +215,7 @@ def home():
 
 		cur.close()
 
-		return render_template('home.html', data_dict = data_dict)
+		return render_template('home.html', data_dict = data_dict, query = query)
 
 	return render_template('home.html')
 

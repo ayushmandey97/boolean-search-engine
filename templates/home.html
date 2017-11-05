@@ -6,7 +6,7 @@
 </head>
 <body>
 		<div class = "jumbotron">
-			<h1 align = "center"> Welcome to ADBool </h1>
+			<h1 align = "center" style = "font-family:Calibri;"> Welcome to BoolScraper </h1>
 		</div>
 		
 		<form method = "POST">
@@ -36,14 +36,14 @@
 	<br>
 	
 	{% if msg is defined %}
-	<h2 align = "center" >{{msg}}</h2>
+	<h2 align = "center" >{{msg}} for '{{query}}'</h2>
 	{% endif %}
 	
 
 	{% if data_dict is defined %}	
 		
 		<hr>
-		<h3 align = "center">Search Results</h3> 
+		<h3 align = "center" >Search Results for '{{query}}'</h3> 
 		<hr>
 		
 		<ul>
