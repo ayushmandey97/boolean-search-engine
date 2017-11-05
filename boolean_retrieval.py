@@ -238,7 +238,7 @@ def index():
 				for row in data:
 					data_dict[row['title']] = row['link']
 			cur.close()
-			return render_template('index.html', data_dict=data_dict, msg = "Invalid URL entered!")
+			return render_template('index.html', data_dict=data_dict, msg = "Invalid URL entered", url = link)
 		
 		soup = BeautifulSoup(f)
 		body = ""
