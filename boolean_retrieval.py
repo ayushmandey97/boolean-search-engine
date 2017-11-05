@@ -225,8 +225,21 @@ def index():
 		
 		#Indexing the entered document
 		link = request.form['url']
-		req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
-		f = urllib.request.urlopen(req).read()
+		
+		try:
+			req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
+			f = urllib.request.urlopen(req).read()
+		except Exception:
+			cur = mysql.connection.cursor()
+			res = cur.execute("select title, link from data")
+			data_dict = {}
+			if res > 0:
+				data = cur.fetchall()
+				for row in data:
+					data_dict[row['title']] = row['link']
+			cur.close()
+			return render_template('index.html', data_dict=data_dict, msg = "Invalid URL entered!")
+		
 		soup = BeautifulSoup(f)
 		body = ""
 

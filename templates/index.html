@@ -33,6 +33,10 @@
 		</div>
 	</form>
 	<br>
+	{% if msg is defined %}
+		<h2 align = "center" >{{msg}}</h2>
+	{% endif %}
+	<br>
 	<hr>
 	<h3 align = "center">List of indexed documents</h3> 
 	<hr>
