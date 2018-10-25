@@ -106,13 +106,17 @@ def get_query_results(query, terms, matrix):
 			else:
 				flag2 = False
 
+			#removing the not terms after marking the flags
 			qterms.remove('not')
 
 	#If it's a single term query
 	if len(qterms) == 1:
+		#not case for single term query
 		if flag1 == False or flag2 == False:
 			flag1 = False
 			flag2 = False
+		
+		#using a bi-gram query system by making the two terms from the same one
 		term1 = qterms[0]
 		term2 = qterms[0]
 		operator = 'and'
@@ -225,6 +229,18 @@ def index():
 		
 		#Indexing the entered document
 		link = request.form['url']
+
+		####### NEW SCRAPE METHOD #########
+		# url = link
+		# source_code = requests.get(url)
+		# plain_text = source_code.content
+		# soup = BeautifulSoup(plain_text, "lxml")
+		# links = soup.findAll('a', {'class': 'a-link-normal s-access-detail-page a-text-normal'})
+		# print len(links)
+		# for link in links:
+		#     title = link.get('title')
+		#     print title
+		###################################
 		
 		try:
 			req = urllib.request.Request(link, headers={'User-Agent': 'Mozilla/5.0'})
@@ -242,6 +258,8 @@ def index():
 		
 		soup = BeautifulSoup(f)
 		body = ""
+
+		
 
 		#Getting the document body from the p tags
 		for page in soup.find_all('p'):
