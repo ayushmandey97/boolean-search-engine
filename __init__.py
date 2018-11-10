@@ -19,6 +19,9 @@ from sql_config import configure
 configure(app)
 mysql = MySQL(app)
 
+#for map-reduce tasks
+from mrjob.job import MRJob
+
 
 def create_term_matrix():
 	table = BeautifulTable()
