@@ -138,13 +138,11 @@ def get_query_results(query):
 	#Returning the list of relevant docs
 	#return relevant_docs, query
 
-
 if __name__ == '__main__':
+	print("###### Building the inverted index ######")
 	MRWordCount.run()
 	print(term_dict)
+	print("###### Inverted index successfully built ######")
+
 	query = input("Enter the query: ")
 	get_query_results(query)
-
-
-
-

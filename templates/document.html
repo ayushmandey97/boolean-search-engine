@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>HOME</title>
+	<title>{{title}}</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'index.css')}}">
 		<link rel="stylesheet" type="text/css" href="index.css">
@@ -8,10 +8,14 @@
 </head>
 <body>
 		<div>
-			<h1 align = "center"> Geddit </h1>
+			<h1 align = "center"> {{title}} </h1>
+		</div>
+
+		<div>
+			<h3 align = "right"> - {{author}} </h1>
 		</div>
 		
-		<form method = "POST">
+		<!-- <form method = "POST">
 		<div class="container">
 			<div class="row">
 		        <div class="col-sm-6 col-sm-offset-3">
@@ -27,36 +31,17 @@
 		            </div>
 		        </div>
 			</div>
-
 		</div>
-
 		<br>
 		 <div align = "right" class = "container" style = "display:inline-block">
-				<button align = "center" type="Submit" class="btn btn-primary btn-lg" id="add">Search document</button>
-				<!-- <a href="/index"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Search</button></a> -->
+				<button type="Submit" class="btn btn-default btn-lg" id="add">Search document</button>
+				<a href="/index"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Add documents</button></a>
 		</div> 
-	</form>
+	</form> -->
 	<br>
 	<br>
+	<p>{{content}}</p>
 	
-	{% if msg is defined %}
-	<h2 align = "center" >{{msg}} for '{{query}}'</h2>
-	{% endif %}
-	
-
-	{% if relevant_docs is defined %}	
-		
-		<hr>
-		<h3 align = "center" >Search Results for '{{query}}'</h3> 
-		<hr>
-		
-		<ul>
-		{% for doc in relevant_docs %}
-			<h3><li style="list-style: none;" align = "center"> <a href = "/document/{{doc}}" target = "_blank"> {{doc}} </a></li><h3>
-		{% endfor %}
-		</ul>
-
-	{% endif %}
 	<script type="text/javascript" src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
