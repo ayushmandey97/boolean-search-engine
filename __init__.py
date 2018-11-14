@@ -29,11 +29,26 @@ existing_terms = set() #To not include the terms reoccurring in the same documen
 term_dict = {} #used as the inverted index for all the terms
 document_list = set() # Contains the names of all documents
 
+## Function to read from file and parse data from it as -> (title, author, content)
+def parse_document(doc_title):
+	f = open(doc_title,'r')
+	lines = f.readlines()
+	title = str(lines[0])
+	author = str(lines[1])
+
+	content = ""
+	for line in lines[2:]:
+		content += line
+
+	return (title, author, content)
+
+
 class MRInvertedIndexer(MRJob):
 	
 	#Need to get (term, docID) yield
 	def mapper(self, _, line):
 		doc_name = os.environ['map_input_file']
+		doc_name = doc_name[5:-4] # to skip 'docs/' and '.txt' from search results
 		document_list.add(doc_name)
 
 		#Getting the content from stored documents
@@ -172,23 +187,10 @@ def home():
 	#For GET request
 	return render_template('home.html')
 
-## Function to read from file and parse data from it as -> (title, author, content)
-def parse_document(doc_title):
-	f = open(doc_title,'r')
-	lines = f.readlines()
-	title = str(lines[0])
-	author = str(lines[1])
-
-	content = ""
-	for line in lines[2:]:
-		content += line
-
-	return (title, author, content)
-
 
 @app.route('/document/<string:doc_title>')
 def document(doc_title):
-	title, author, content = parse_document(doc_title)
+	title, author, content = parse_document("docs/" + doc_title + ".txt")
 	return render_template('document.html', title = title, author = author, content = content)
 
 
