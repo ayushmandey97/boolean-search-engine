@@ -43,39 +43,6 @@ def parse_document(doc_title):
 	return (title, author, content)
 
 
-class MRInvertedIndexer(MRJob):
-	
-	#Need to get (term, docID) yield
-	def mapper(self, _, line):
-		doc_name = os.environ['map_input_file']
-		doc_name = doc_name[5:-4] # to skip 'docs/' and '.txt' from search results
-		document_list.add(doc_name)
-
-		#Getting the content from stored documents
-		tokens = word_tokenize(line)
-
-		print(tokens) #contains stop words
-		
-		#eliminating stop words from the documents
-		terms = [word for word in tokens if not word in stop_words]
-		terms = list(set(terms))
-		
-		print(terms) #doesnt contain stop words
-
-		for term in terms:
-			if (term, doc_name) not in existing_terms:
-				yield(term, doc_name)
-				existing_terms.add((term, doc_name))
-
-	
-	#need to reduce the (term -> [doc list]) yield
-	def reducer(self, term, docs):
-		lister = []
-		lister.extend(docs)
-		yield(term, lister)
-
-		#(term -> [doc_list]) dictionary
-		term_dict[term] = lister
 
 #Query parser
 def get_query_results(query):
@@ -176,7 +143,29 @@ def home():
 		query = request.form['query']
 
 		#matrix, terms = create_term_matrix()
-		MRInvertedIndexer.run() #builds the inverted index and gets the terms
+		#MRInvertedIndexer.run() #builds the inverted index and gets the terms
+
+		## Getting the list of documents
+		cur = mysql.connection.cursor()
+		res = cur.execute("select doc_name from documents")
+		if res > 0:
+			data = cur.fetchall()
+			for row in data:
+				document_list.add(row['doc_name'])
+
+		#Retreiving the inverted index
+		res = cur.execute("select * from inverted_index")
+		if res > 0:
+			data = cur.fetchall()
+			for row in data:
+				if row['term'] in term_dict:
+					term_dict[row['term']].append(row['doc'])
+				else:
+					term_dict[row['term']] = [row['doc']]
+
+		cur.close()
+		#print(term_dict)
+		#Applying the boolean query parser over the inverted index
 		relevant_docs, query = get_query_results(query=query)
 		
 		if relevant_docs == False:
