@@ -10,13 +10,35 @@
 </head>
 <style type="text/css">
     .w3-card-4{
-        margin: 1% 25% !important;
-        width: 50% !important;
+    margin: 1% 25% !important;
+    width: 50% !important;
+    }
+    .logo{
+        height: 220px;
+        width: 570px;
+    }
+    .w3-button{
+        background: #428bca; 
+        color: white;
+        font-weight: 700;
+    }
+    .w3-card-4{
+        font-family: Raleway;
+    }
+    .w3-container{
+        font-family: Raleway;
+    }
+    .button{
+    	.margin-left: 10px;
+    }
+    .logo{
+    	margin:0% 25%;
     }
 </style>
 <body>
 		<div>
-			<h1 align = "center"> Geddit </h1>
+			<!-- <h1 align = "center"> Geddit </h1> -->
+			<img alt="Brand" src= "{{ url_for('static', filename='stylesheets/assets/geddit.png') }}">
 		</div>
 		
 		<form method = "POST">
@@ -77,8 +99,8 @@
 		  <p> {{val[1]}} </p>
 		</div>
 
-		<a href = "/document/{{doc}}"><button class="w3-button w3-block w3-dark-grey">Read more.. </button></a>
-		</div>
+<!-- 		<a href = "/document/{{doc}}"><button class="w3-button w3-block w3-dark-grey">Read more.. </button></a>
+ -->		</div>
 
 		<hr>
 			<!-- <h3><li style="list-style: none;" align = "center"> <a href = "/document/{{doc}}" target = "_blank"> {{doc}} </a></li><h3> -->
