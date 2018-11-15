@@ -21,6 +21,10 @@ import csv
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
+#For variations - thesaurus, stemming, lemmatizing
+from whoosh.lang.morph_en import variations
+from whoosh.lang.porter import stem
+
 stop_words = set(stopwords.words('english')) #Getting the list of stop words
 existing_terms = set() #To not include the terms reoccurring in the same document
 document_list = set() # Contains the names of all documents
@@ -41,12 +45,15 @@ class MRInvertedIndexer(MRJob):
 		print(tokens) #contains stop words
 		
 		#eliminating stop words from the documents
-		terms = [word for word in tokens if not word in stop_words]
+		terms = [stem(word) for word in tokens if not word in stop_words]
 		terms = list(set(terms))
-		
-		print(terms) #doesnt contain stop words
-
+		all_words = []
 		for term in terms:
+			all_words.extend(variations(term))
+		
+		print(all_words) #doesnt contain stop words
+
+		for term in all_words:
 			if (term, doc_name) not in existing_terms:
 				yield(term, doc_name)
 				existing_terms.add((term, doc_name))
@@ -85,7 +92,7 @@ def index_docs():
 @app.route("/")
 def home():
 	MRInvertedIndexer.run() #builds the inverted index and gets the terms
-	index_docs()
+	#index_docs()
 	return '<h1 align = "center">Data successfully indexed into cache database</h1>'
 
 if __name__ == '__main__':
