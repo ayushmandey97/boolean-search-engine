@@ -14,8 +14,9 @@
     width: 50% !important;
     }
     .logo{
-        height: 220px;
-        width: 570px;
+        height: 250px;
+        width: 650px;
+        margin-left:  33%;
     }
     .w3-button{
         background: #428bca; 
@@ -31,14 +32,11 @@
     .button{
     	.margin-left: 10px;
     }
-    .logo{
-    	margin:0% 25%;
-    }
 </style>
 <body>
 		<div>
 			<!-- <h1 align = "center"> Geddit </h1> -->
-			<img alt="Brand" src= "{{ url_for('static', filename='stylesheets/assets/geddit.png') }}">
+			<img alt="Brand" src= "{{ url_for('static', filename='stylesheets/assets/geddit.png') }}" class="logo">
 		</div>
 		
 		<form method = "POST">
@@ -61,7 +59,7 @@
 		</div>
 
 		<br>
-		 <div align = "right" class = "container" style = "display:inline-block">
+		 <div align = "center" class = "container">
 				<button align = "center" type="Submit" class="btn btn-primary btn-lg" id="add">Search document</button>
 				<!-- <a href="/index"><button style = "margin-left:10px; margin-right:20px;"type="button" class="btn btn-primary btn-lg" id="add">Search</button></a> -->
 		</div> 

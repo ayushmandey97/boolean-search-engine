@@ -171,13 +171,15 @@ def home():
 		#Applying the boolean query parser over the inverted index
 		docs, query = get_query_results(query=query)
 
+		
+		
+		if docs == False:
+			return render_template('home.html', msg = "No relevant documents found", query = query)
+
 		relevant_docs = {}
 		for doc in docs:
 			title, author, content = parse_document("docs/" + doc + ".txt")
 			relevant_docs[title] = [author, content[:350]]
-		
-		if relevant_docs == False:
-			return render_template('home.html', msg = "No relevant documents found", query = query)
 
 		return render_template('home.html', relevant_docs = relevant_docs, query = query)
 
