@@ -5,7 +5,15 @@
 	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'index.css')}}">
 		<!-- <link rel="stylesheet" type="text/css" href="index.css"> -->
 	<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet"> 
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
 </head>
+<style type="text/css">
+    .w3-card-4{
+        margin: 1% 25% !important;
+        width: 50% !important;
+    }
+</style>
 <body>
 		<div>
 			<h1 align = "center"> Geddit </h1>
@@ -50,11 +58,34 @@
 		<h3 align = "center" >Search Results for '{{query}}'</h3> 
 		<hr>
 		
-		<ul>
-		{% for doc in relevant_docs %}
-			<h3><li style="list-style: none;" align = "center"> <a href = "/document/{{doc}}" target = "_blank"> {{doc}} </a></li><h3>
+		
+
+
+		{% for doc, val in relevant_docs.items() %}
+
+			 <div class="w3-card-4">
+
+		<header class="w3-container w3-light-grey">
+		  <h3>
+		<a href = "/document/{{doc}}" target = "_blank"> {{doc}} </a>
+		</h3>
+		</header>
+
+		<div class="w3-container">
+		  <p>{{val[0]}}</p>
+		  <hr>
+		  <p> {{val[1]}} </p>
+		</div>
+
+		<a href = "/document/{{doc}}"><button class="w3-button w3-block w3-dark-grey">Read more.. </button></a>
+		</div>
+
+		<hr>
+			<!-- <h3><li style="list-style: none;" align = "center"> <a href = "/document/{{doc}}" target = "_blank"> {{doc}} </a></li><h3> -->
 		{% endfor %}
-		</ul>
+		
+
+
 
 	{% endif %}
 	<script type="text/javascript" src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>

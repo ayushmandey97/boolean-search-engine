@@ -101,10 +101,12 @@ for index, row in df.iterrows():
 	try:
 		with open(str("docs/" + row['title'] + ".txt"), "w+") as f:
 			f.write(row['title'])
+			f.write("\n")
 			
 			key = str(paper_authors_dict[row['paper_id']])
 			authors = key[1:-1] #removing the list brackets []
 			f.write(authors)
+			f.write("\n")
 			
 			f.write(row['paper_text'])
 	except:

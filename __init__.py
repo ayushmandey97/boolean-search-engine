@@ -35,6 +35,7 @@ def parse_document(doc_title):
 	lines = f.readlines()
 	title = str(lines[0])
 	author = str(lines[1])
+	author = author[1:-2]
 
 	content = ""
 	for line in lines[2:]:
@@ -166,7 +167,12 @@ def home():
 		cur.close()
 		#print(term_dict)
 		#Applying the boolean query parser over the inverted index
-		relevant_docs, query = get_query_results(query=query)
+		docs, query = get_query_results(query=query)
+
+		relevant_docs = {}
+		for doc in docs:
+			title, author, content = parse_document("docs/" + doc + ".txt")
+			relevant_docs[title] = [author, content[:200]]
 		
 		if relevant_docs == False:
 			return render_template('home.html', msg = "No relevant documents found", query = query)
