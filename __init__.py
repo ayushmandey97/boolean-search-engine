@@ -39,7 +39,9 @@ def parse_document(doc_title):
 
 	content = ""
 	for line in lines[2:]:
-		content += line
+		if 'abstract' in line.lower():
+			for line in lines:
+				content += line
 
 	return (title, author, content)
 
@@ -172,7 +174,7 @@ def home():
 		relevant_docs = {}
 		for doc in docs:
 			title, author, content = parse_document("docs/" + doc + ".txt")
-			relevant_docs[title] = [author, content[:200]]
+			relevant_docs[title] = [author, content[:350]]
 		
 		if relevant_docs == False:
 			return render_template('home.html', msg = "No relevant documents found", query = query)
